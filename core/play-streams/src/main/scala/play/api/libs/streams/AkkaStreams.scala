@@ -118,7 +118,8 @@ object AkkaStreams {
       // This pattern is an effective way to absorb cancellation, Sink.ignore will keep the broadcast always flowing
       // even after sink.inlet cancels.
       val broadcast = builder.add(Broadcast[T](2, eagerCancel = false))
-      broadcast.out(0) ~> ignore.in
+      // TODO
+      // broadcast.out(0) ~> ignore.in
       FlowShape(broadcast.in, broadcast.out(1))
     })
   }

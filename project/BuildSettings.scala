@@ -75,6 +75,24 @@ object BuildSettings {
     fileHeaderSettings,
     homepage := Some(url("https://playframework.com")),
     ivyLoggingLevel := UpdateLogging.DownloadOnly,
+    scalaVersion := "3.1.1",
+    scalacOptions ++= Seq("-Ykind-projector", "-source", "3.0-migration", "-Xignore-scala2-macros"),
+    libraryDependencies ~= {
+      _.map { x =>
+        if (x.organization == "com.typesafe.play" && x.crossVersion.isInstanceOf[CrossVersion.Binary]) {
+          x.cross(CrossVersion.for3Use2_13)
+        } else {
+          x
+        }
+      }
+    },
+    conflictWarning := {
+      if (scalaBinaryVersion.value == "3") {
+        ConflictWarning("warn", Level.Warn, false)
+      } else {
+        conflictWarning.value
+      }
+    },
     resolvers ++= Seq(
       Resolver.sonatypeRepo("releases"), // sync ScriptedTools.scala
       Resolver.typesafeRepo("releases"),

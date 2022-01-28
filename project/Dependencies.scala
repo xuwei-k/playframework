@@ -21,12 +21,12 @@ object Dependencies {
     "specs2-core",
     "specs2-junit",
     "specs2-mock"
-  ).map("org.specs2" %% _ % specs2Version)
+  ).map(x => ("org.specs2" %% x % specs2Version).cross(CrossVersion.for3Use2_13))
 
-  val specsMatcherExtra = "org.specs2" %% "specs2-matcher-extra" % specs2Version
+  val specsMatcherExtra = ("org.specs2" %% "specs2-matcher-extra" % specs2Version).cross(CrossVersion.for3Use2_13)
 
   val scalacheckDependencies = Seq(
-    "org.specs2"     %% "specs2-scalacheck" % specs2Version % Test,
+    ("org.specs2" %% "specs2-scalacheck" % specs2Version % Test).cross(CrossVersion.for3Use2_13),
     "org.scalacheck" %% "scalacheck"        % "1.15.4"      % Test
   )
 
@@ -79,9 +79,9 @@ object Dependencies {
     "org.hibernate"                   % "hibernate-core"        % "5.4.32.Final" % "test"
   )
 
-  def scalaReflect(scalaVersion: String) = "org.scala-lang" % "scala-reflect" % scalaVersion % "provided"
+  def scalaReflect(scalaVersion: String) = "org.scala-lang" % "scala-reflect" % "2.13.8" % "provided"
   val scalaJava8Compat                   = "org.scala-lang.modules" %% "scala-java8-compat" % "1.0.2"
-  val scalaParserCombinators             = Seq("org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2")
+  val scalaParserCombinators             = Seq("org.scala-lang.modules" %% "scala-parser-combinators" % "2.0.0")
 
   val springFrameworkVersion = "5.3.14"
 
