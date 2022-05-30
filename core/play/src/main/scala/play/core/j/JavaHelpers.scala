@@ -231,7 +231,7 @@ class RequestHeaderImpl(header: RequestHeader) extends JRequestHeader {
 
   @deprecated
   override def getQueryString(key: String): String = {
-    if (queryString().containsKey(key) && queryString().get(key).length > 0) queryString().get(key)(0) else null
+    if (queryString.containsKey(key) && queryString.get(key).length > 0) queryString.get(key)(0) else null
   }
 
   override def queryString(key: String): Optional[String] = header.getQueryString(key).toJava
@@ -279,7 +279,7 @@ class RequestImpl(request: Request[RequestBody]) extends RequestHeaderImpl(reque
   override def addAttrs(e1: TypedEntry[_], e2: TypedEntry[_]): JRequest = withAttrs(attrs.putAll(e1, e2))
   override def addAttrs(e1: TypedEntry[_], e2: TypedEntry[_], e3: TypedEntry[_]): JRequest =
     withAttrs(attrs.putAll(e1, e2, e3))
-  override def addAttrs(entries: TypedEntry[_]*): JRequest           = withAttrs(attrs.putAll(entries: _*))
+  override def addAttrs(entries: Seq[TypedEntry[_]]): JRequest       = withAttrs(attrs.putAll(entries: _*))
   override def addAttrs(entries: util.List[TypedEntry[_]]): JRequest = withAttrs(attrs.putAll(entries))
   override def removeAttr(key: TypedKey[_]): JRequest                = withAttrs(attrs.remove(key))
 

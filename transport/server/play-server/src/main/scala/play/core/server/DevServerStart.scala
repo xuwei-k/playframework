@@ -349,8 +349,8 @@ final class DevServerStart(
         // the Application and the Server use separate ActorSystems (e.g. DevMode).
         serverCs.addTask(CoordinatedShutdown.PhaseServiceStop, "shutdown-application-dev-mode") { () =>
           implicit val ctx = actorSystem.dispatcher
-          appProvider.lastState.foreach(Play.stop)
-          appProvider.isShutdown.set(true)
+//          appProvider.lastState.foreach(Play.stop)
+//          appProvider.isShutdown.set(true)
           Future(Done)
         }
 

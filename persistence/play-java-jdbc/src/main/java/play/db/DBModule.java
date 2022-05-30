@@ -52,7 +52,7 @@ public final class DBModule extends Module {
   }
 
   private NamedDatabase named(String name) {
-    return new NamedDatabaseImpl(name);
+    return play.inject.Annotations.namedDatabase(name);
   }
 
   /** Inject provider for named databases. */

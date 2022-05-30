@@ -52,6 +52,9 @@ lazy val StreamsProject = PlayCrossBuiltProject("Play-Streams", "core/play-strea
 
 lazy val PlayExceptionsProject = PlayNonCrossBuiltProject("Play-Exceptions", "core/play-exceptions")
 
+lazy val PlayAnnotationsProject = PlayNonCrossBuiltProject("Play-Annotations", "core/play-annotations")
+  .settings(libraryDependencies += javaxInject)
+
 lazy val billOfMaterials = PlayCrossBuiltProject("bill-of-materials", "dev-mode/bill-of-materials")
   .enablePlugins(BillOfMaterialsPlugin)
   .settings(
@@ -104,6 +107,7 @@ lazy val PlayProject = PlayCrossBuiltProject("Play", "core/play")
   )
   .settings(Docs.playdocSettings: _*)
   .dependsOn(
+    PlayAnnotationsProject,
     BuildLinkProject,
     StreamsProject
   )

@@ -43,8 +43,8 @@ class TemporaryFileReaperSpec(implicit ee: ExecutionEnv) extends Specification w
       val config = TemporaryFileReaperConfiguration(
         enabled = false,
         olderThan = 1.seconds,
-        initialDelay = 0 seconds,
-        interval = 100 millis
+        initialDelay = 0.seconds,
+        interval = 100.millis
       )
 
       val file = parentDirectory.resolve("notcollected.txt")
@@ -71,8 +71,8 @@ class TemporaryFileReaperSpec(implicit ee: ExecutionEnv) extends Specification w
       val config = TemporaryFileReaperConfiguration(
         enabled = false,
         olderThan = 1.seconds,
-        initialDelay = 0 seconds,
-        interval = 100 millis
+        initialDelay = 0.seconds,
+        interval = 100.millis
       )
 
       val file = parentDirectory.resolve("notcollected.txt")
@@ -94,8 +94,8 @@ class TemporaryFileReaperSpec(implicit ee: ExecutionEnv) extends Specification w
       val config = TemporaryFileReaperConfiguration(
         enabled = false,
         olderThan = 1.seconds,
-        initialDelay = 0 seconds,
-        interval = 100 millis
+        initialDelay = 0.seconds,
+        interval = 100.millis
       )
       val reaper = new DefaultTemporaryFileReaper(system, config) {
         override val clock = Clock.fixed(Instant.now, ZoneId.systemDefault())
@@ -111,8 +111,8 @@ class TemporaryFileReaperSpec(implicit ee: ExecutionEnv) extends Specification w
       val config = TemporaryFileReaperConfiguration(
         enabled = true,
         olderThan = 1.seconds,
-        initialDelay = 0 seconds,
-        interval = 100 millis
+        initialDelay = 0.seconds,
+        interval = 100.millis
       )
       val reaper = new DefaultTemporaryFileReaper(system, config) {
         override val clock = Clock.fixed(Instant.now, ZoneId.systemDefault())

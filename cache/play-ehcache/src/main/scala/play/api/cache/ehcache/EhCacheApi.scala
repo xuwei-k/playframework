@@ -71,7 +71,7 @@ class EhCacheModule
 
       // Creates a named cache qualifier
       def named(name: String): NamedCache = {
-        new NamedCacheImpl(name)
+        play.inject.Annotations.namedCache(name)
       }
 
       // bind wrapper classes
@@ -221,7 +221,7 @@ class SyncEhCacheApi @Inject() (private[ehcache] val cache: Ehcache) extends Syn
       .map(_.getObjectValue)
       .filter { v =>
         Primitives.wrap(ct.runtimeClass).isInstance(v) ||
-        ct == ClassTag.Nothing || (ct == ClassTag.Unit && v == ((): Unit))
+        ct == ClassTag.Nothing || (ct == ClassTag.Unit && v.equals((): Unit))
       }
       .asInstanceOf[Option[T]]
   }
