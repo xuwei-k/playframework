@@ -854,7 +854,7 @@ case class RepeatedMapping[T](
     val allErrorsOrItems: Seq[Either[Seq[FormError], T]] =
       RepeatedMapping.indexes(key, data).map(i => wrapped.withPrefix(s"$key[$i]").bind(data))
     if (allErrorsOrItems.forall(_.isRight)) {
-      Right(allErrorsOrItems.map(_.toOption.get).toList).flatMap(applyConstraints)
+      Right(allErrorsOrItems.collect { case Right(value) => value }.toList).flatMap(applyConstraints)
     } else {
       Left(allErrorsOrItems.collect { case Left(errors) => errors }.flatten)
     }

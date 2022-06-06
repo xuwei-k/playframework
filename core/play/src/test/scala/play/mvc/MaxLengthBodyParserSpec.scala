@@ -26,7 +26,7 @@ import play.http.DefaultHttpErrorHandler
 import play.libs.F
 
 import scala.jdk.CollectionConverters._
-import scala.compat.java8.OptionConverters._
+import scala.jdk.OptionConverters._
 
 class MaxLengthBodyParserSpec extends Specification with AfterAll with MustMatchers {
   "Java MaxLengthBodyParserSpec" title
@@ -63,8 +63,8 @@ class MaxLengthBodyParserSpec extends Specification with AfterAll with MustMatch
   }
 
   def maxLengthEnforced(result: F.Either[Result, _]) = {
-    result.left.asScala.map(_.status) must beSome(Status.REQUEST_ENTITY_TOO_LARGE)
-    result.right.asScala must beNone
+    result.left.toScala.map(_.status) must beSome(Status.REQUEST_ENTITY_TOO_LARGE)
+    result.right.toScala must beNone
   }
 
   val bodyParsers: Seq[(BodyParser[_], Option[String], ByteString)] = Seq(
@@ -152,8 +152,8 @@ class MaxLengthBodyParserSpec extends Specification with AfterAll with MustMatch
             food = data,
             ai = ai
           )
-          result.left.asScala must beNone
-          result.right.asScala must beSome // successfully parsed
+          result.left.toScala must beNone
+          result.right.toScala must beSome // successfully parsed
           ai.get must_== 1                 // also makes sure parsing took place
         }
       }
@@ -172,8 +172,8 @@ class MaxLengthBodyParserSpec extends Specification with AfterAll with MustMatch
             food = data,
             ai = ai
           )
-          result.left.asScala must beNone
-          result.right.asScala must beSome // successfully parsed
+          result.left.toScala must beNone
+          result.right.toScala must beSome // successfully parsed
           ai.get must_== 1                 // also makes sure parsing took place
         }
       }

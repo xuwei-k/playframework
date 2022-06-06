@@ -166,7 +166,7 @@ backslash.dummy=\a\b\c\e\f
 
   "MessagesPlugin" should {
     "parse file" in {
-      val parser = new Messages.MessagesParser(new MessageSource { def read = testMessageFile }, "messages")
+      val parser = new Messages.MessagesParser(new MessageSource { def read: String = testMessageFile }, "messages")
 
       val messages = parser.parse.toSeq.flatten.map(x => x.key -> x.pattern).toMap
 
