@@ -17,6 +17,7 @@ class HomeControllerSpec extends PlaySpec with GuiceOneAppPerTest with Injecting
   "HomeController GET" should {
 
     "responds 'original' in plain text" in {
+      try {
       implicit val executionContext = inject[ExecutionContext]
       val futures = inject[Futures]
 
@@ -26,6 +27,10 @@ class HomeControllerSpec extends PlaySpec with GuiceOneAppPerTest with Injecting
       status(home) mustBe OK
       contentType(home) mustBe Some("text/plain")
       contentAsString(home) must include("original")
+      } catch {
+        case e => e.printStackTrace
+          throw e
+      }
     }
 
   }
