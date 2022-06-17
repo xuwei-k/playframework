@@ -21,9 +21,7 @@ object Dependencies {
     "specs2-core",
     "specs2-junit"
   ).map("org.specs2" %% _ % specs2Version)
-  val specs2Deps = specs2CoreDeps ++ Seq(
-    "specs2-mock"
-  ).map("org.specs2" %% _ % specs2Version)
+  val specs2Deps = specs2CoreDeps
 
   val specsMatcherExtra = "org.specs2" %% "specs2-matcher-extra" % specs2Version
 
@@ -90,7 +88,7 @@ object Dependencies {
     "org.hibernate"                   % "hibernate-core"        % "5.4.32.Final" % "test"
   )
 
-  def scalaReflect(scalaVersion: String) = "org.scala-lang" % "scala-reflect" % scalaVersion % "provided"
+  def scalaReflect(scalaVersion: String) = "org.scala-lang" % "scala-reflect" % "2.13.8" % "provided"
   def scalaParserCombinators(scalaVersion: String) =
     Seq("org.scala-lang.modules" %% "scala-parser-combinators" % {
       CrossVersion.partialVersion(scalaVersion) match {
@@ -169,9 +167,9 @@ object Dependencies {
     ("io.netty" % "netty-transport-native-epoll" % nettyVersion).classifier("linux-x86_64")
   ) ++ specs2Deps.map(_ % Test)
 
-  val akkaHttp = "com.typesafe.akka" %% "akka-http-core" % akkaHttpVersion
+  val akkaHttp = "com.typesafe.akka" %% "akka-http-core" % akkaHttpVersion cross CrossVersion.for3Use2_13
 
-  val akkaHttp2Support = "com.typesafe.akka" %% "akka-http2-support" % akkaHttpVersion
+  val akkaHttp2Support = "com.typesafe.akka" %% "akka-http2-support" % akkaHttpVersion cross CrossVersion.for3Use2_13
 
   val cookieEncodingDependencies = slf4j
 
@@ -191,7 +189,7 @@ object Dependencies {
     )
   }
 
-  val playFileWatch = "com.lightbend.play" %% "play-file-watch" % "1.1.16"
+  val playFileWatch = "com.typesafe.play" %% "play-file-watch" % "1.2.0-M1"
 
   def runSupportDependencies(sbtVersion: String): Seq[ModuleID] = {
     Seq(playFileWatch, logback % Test) ++ specs2Deps.map(_ % Test)
@@ -279,16 +277,16 @@ object Dependencies {
 
   val playWsStandaloneVersion = "2.2.0-M1"
   val playWsDeps = Seq(
-    "com.typesafe.play" %% "play-ws-standalone"      % playWsStandaloneVersion,
-    "com.typesafe.play" %% "play-ws-standalone-xml"  % playWsStandaloneVersion,
-    "com.typesafe.play" %% "play-ws-standalone-json" % playWsStandaloneVersion,
+    "com.typesafe.play" %% "play-ws-standalone"      % playWsStandaloneVersion cross CrossVersion.for3Use2_13,
+    "com.typesafe.play" %% "play-ws-standalone-xml"  % playWsStandaloneVersion cross CrossVersion.for3Use2_13,
+    "com.typesafe.play" %% "play-ws-standalone-json" % playWsStandaloneVersion cross CrossVersion.for3Use2_13,
     // Update transitive Akka version as needed:
     "com.typesafe.akka"                        %% "akka-stream" % akkaVersion
   ) ++ (specs2Deps :+ specsMatcherExtra).map(_ % Test) :+ mockitoAll % Test
 
   // Must use a version of ehcache that supports jcache 1.0.0
   val playAhcWsDeps = Seq(
-    "com.typesafe.play"             %% "play-ahc-ws-standalone" % playWsStandaloneVersion,
+    "com.typesafe.play"             %% "play-ahc-ws-standalone" % playWsStandaloneVersion cross CrossVersion.for3Use2_13,
     "com.typesafe.play"             % "shaded-asynchttpclient"  % playWsStandaloneVersion,
     "com.typesafe.play"             % "shaded-oauth"            % playWsStandaloneVersion,
     "com.github.ben-manes.caffeine" % "jcache"                  % caffeineVersion % Test,

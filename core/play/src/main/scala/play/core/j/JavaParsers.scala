@@ -44,7 +44,7 @@ object JavaParsers {
 
   def toJavaRaw(rawBuffer: RawBuffer): play.mvc.Http.RawBuffer = {
     new play.mvc.Http.RawBuffer {
-      def size                    = rawBuffer.size
+      def size()                  = rawBuffer.size
       def asBytes(maxLength: Int) = rawBuffer.asBytes(maxLength).orNull
       def asBytes                 = rawBuffer.asBytes().orNull
       def asFile                  = rawBuffer.asFile

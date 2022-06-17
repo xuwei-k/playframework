@@ -297,7 +297,6 @@ object JavascriptLiteral {
  * Default binders for Query String
  */
 object QueryStringBindable {
-  import play.api.mvc.macros.BinderMacros
   import scala.language.experimental.macros
 
   /**
@@ -647,14 +646,13 @@ object QueryStringBindable {
     }
 
   implicit def anyValQueryStringBindable[T <: AnyVal]: QueryStringBindable[T] =
-    macro BinderMacros.anyValQueryStringBindable[T]
+    ???
 }
 
 /**
  * Default binders for URL path part.
  */
 object PathBindable {
-  import play.api.mvc.macros.BinderMacros
   import scala.language.experimental.macros
 
   /**
@@ -775,7 +773,7 @@ object PathBindable {
   /**
    * Path binder for AnyVal
    */
-  implicit def anyValPathBindable[T <: AnyVal]: PathBindable[T] = macro BinderMacros.anyValPathBindable[T]
+  implicit def anyValPathBindable[T <: AnyVal]: PathBindable[T] = ???
 
   /**
    * Path binder for Java Boolean.

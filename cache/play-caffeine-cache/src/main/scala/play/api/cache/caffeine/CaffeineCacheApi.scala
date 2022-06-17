@@ -67,7 +67,7 @@ class CaffeineCacheModule
 
       // Creates a named cache qualifier
       def named(name: String): NamedCache = {
-        new NamedCacheImpl(name)
+        play.inject.Annotations.namedCache(name)
       }
 
       // bind wrapper classes

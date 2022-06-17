@@ -68,9 +68,22 @@ lazy val PlayJodaFormsProject = PlayCrossBuiltProject("Play-Joda-Forms", "web/pl
   )
   .dependsOn(PlayProject, PlaySpecs2Project % "test")
 
+// https://github.com/lampepfl/dotty/issues/12840
+lazy val Annotation = config("annotation")
+
+lazy val workaroundScala3Issue12840 = Def.settings(
+  inConfig(Annotation)(Defaults.configSettings),
+  ivyConfigurations += Annotation.hide.extend(Compile),
+  mimaCurrentClassfiles := (Compile / Keys.`package`).value,
+  Compile / unmanagedClasspath ++= (Annotation / products).value,
+  Compile / packageSrc / mappings ++= (Annotation / packageSrc / mappings).value,
+  Compile / packageBin / mappings ++= (Annotation / packageBin / mappings).value,
+)
+
 lazy val PlayProject = PlayCrossBuiltProject("Play", "core/play")
   .enablePlugins(SbtTwirl)
   .settings(
+    workaroundScala3Issue12840,
     libraryDependencies ++= runtime(scalaVersion.value) ++ scalacheckDependencies ++ cookieEncodingDependencies :+
       jimfs % Test,
     (Compile / sourceGenerators) += Def

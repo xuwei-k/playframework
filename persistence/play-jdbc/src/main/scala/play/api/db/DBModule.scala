@@ -10,7 +10,6 @@ import javax.inject.Provider
 import javax.inject.Singleton
 import play.api._
 import play.api.inject._
-import play.db.NamedDatabaseImpl
 
 import scala.concurrent.Future
 import scala.util.Try
@@ -21,7 +20,7 @@ import scala.util.Try
 final class DBModule
     extends SimpleModule((environment, configuration) => {
       def bindNamed(name: String): BindingKey[Database] = {
-        bind[Database].qualifiedWith(new NamedDatabaseImpl(name))
+        bind[Database].qualifiedWith(play.inject.Annotations.namedDatabase(name))
       }
 
       def namedDatabaseBindings(dbs: Set[String]): Seq[Binding[_]] = dbs.toSeq.map { db =>
