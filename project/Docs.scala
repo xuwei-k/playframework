@@ -38,30 +38,30 @@ object Docs {
   lazy val settings = Seq(
     apiDocsInclude        := false,
     apiDocsIncludeManaged := false,
-    apiDocsScalaSources   := Def.taskDyn {
+    apiDocsScalaSources   := Def.uncached(Def.taskDyn {
       val pr = thisProjectRef.value
       val bs = buildStructure.value
       Def.task(allSources(Compile, ".scala", pr, bs).value)
-    }.value,
-    apiDocsClasspath := Def.taskDyn {
+    }.value),
+    apiDocsClasspath := Def.uncached(Def.taskDyn {
       val pr = thisProjectRef.value
       val bs = buildStructure.value
       Def.task(allClasspaths(pr, bs).value)
-    }.value,
-    apiDocsJavaSources := Def.taskDyn {
+    }.value),
+    apiDocsJavaSources := Def.uncached(Def.taskDyn {
       val pr = thisProjectRef.value
       val bs = buildStructure.value
       Def.task(allSources(Compile, ".java", pr, bs).value)
-    }.value,
-    (Global / allConfs) := Def.taskDyn {
+    }.value),
+    (Global / allConfs) := Def.uncached(Def.taskDyn {
       val pr = thisProjectRef.value
       val bs = buildStructure.value
       Def.task(allConfsTask(pr, bs).value)
-    }.value,
-    apiDocs                 := apiDocsTask.value,
-    checkApiDocsPackageTree := checkApiDocsPackageTreeTask.value,
+    }.value),
+    apiDocs                 := Def.uncached(apiDocsTask.value),
+    checkApiDocsPackageTree := Def.uncached(checkApiDocsPackageTreeTask.value),
     ivyConfigurations += Webjars,
-    extractWebjars := extractWebjarContents.value,
+    extractWebjars := Def.uncached(extractWebjarContents.value),
     (Compile / packageBin / mappings) ++= {
       val apiBase = apiDocs.value
       val webjars = extractWebjars.value
@@ -81,14 +81,16 @@ object Docs {
         case (projectName, conf) => conf -> s"play/docs/content/confs/$projectName/${conf.getName}"
       }
 
-      docMappings ++ apiDocMappings ++ webjarMappings ++ referenceConfMappings
+      (docMappings ++ apiDocMappings ++ webjarMappings ++ referenceConfMappings).map { (k, v) =>
+        fileConverter.value.toVirtualFile(k.toPath) -> v
+      }
     }
   )
 
   def playdocSettings: Seq[Setting[?]] = Def.settings(
     Playdoc.projectSettings,
     ivyConfigurations += Webjars,
-    extractWebjars := extractWebjarContents.value,
+    extractWebjars := Def.uncached(extractWebjarContents.value),
     libraryDependencies ++= Dependencies.playdocWebjarDependencies,
     (playdocPackage / mappings) := {
       val base        = (ThisBuild / baseDirectory).value
@@ -107,7 +109,9 @@ object Docs {
         case (projectName, conf) => conf -> s"confs/$projectName/${conf.getName}"
       }
 
-      docMappings ++ webjarMappings ++ referenceConfs
+      (docMappings ++ webjarMappings ++ referenceConfs).map { (k, v) =>
+        fileConverter.value.toVirtualFile(k.toPath) -> v
+      }
     }
   )
 
@@ -231,10 +235,10 @@ object Docs {
 
   // Converts sbt apiMappings into Scala 3 Scaladoc external mapping options.
   // Scala 3 needs explicit mapping format tags, unlike the Scala 2 -doc-external-doc option.
-  private def scala3ExternalMappings(mappings: Map[File, URL]): Seq[String] = {
+  private def scala3ExternalMappings(mappings: Map[File, URI]): Seq[String] = {
     // Scala 3 external mappings expect the API base URL, not the index.html page used by sbt apiMappings.
-    def apiBase(url: URL): String =
-      url.toString.stripSuffix("index.html")
+    def apiBase(url: URI): String =
+      url.toURL.toString.stripSuffix("index.html")
 
     mappings.toSeq.sortBy { case (jar, _) => jar.getAbsolutePath }.map {
       case (jar, url) =>
@@ -243,7 +247,7 @@ object Docs {
         val (format, apiUrl) =
           if (name.startsWith("scala-library-") || name.startsWith("scala3-library_3-")) {
             "scaladoc3" -> "https://www.scala-lang.org/api/3.x/"
-          } else if (url.toString.startsWith("https://pekko.apache.org/api/pekko/")) {
+          } else if (url.toURL.toString.startsWith("https://pekko.apache.org/api/pekko/")) {
             "scaladoc3" -> apiBase(url)
           } else {
             "javadoc" -> apiBase(url)
@@ -259,7 +263,7 @@ object Docs {
     val label   = s"Play $version"
 
     val commitish   = if (version.endsWith("-SNAPSHOT")) BuildSettings.snapshotBranch else version
-    val mappings    = apiMappings.value
+    val mappings    = apiMappings.value.map { (k, v) => fileConverter.value.toPath(k).toFile -> v }
     val externalDoc =
       Opts.doc.externalAPI(mappings).head.replace("-doc-external-doc:", "") // from the "doc" task
     val rootDirectory = (ThisBuild / baseDirectory).value
@@ -294,7 +298,7 @@ object Docs {
     val cache  = apiDocsCache("scalaapidocs.cache").value
     val scalac = (Compile / doc / compilers).value.scalac().asInstanceOf[AnalyzingCompiler]
 
-    val scaladoc = Doc.scaladoc(label, cache, scalac)
+    val scaladoc: (Seq[File], Seq[File], File, Seq[String], Int, sbt.internal.util.ManagedLogger) => Unit = ???
 
     val classpath = apiDocsClasspath.value.toList
     val sources   =
@@ -338,7 +342,7 @@ object Docs {
     val cache     = apiDocsCache("javaapidocs.cache").value
     val javaTools = compilers.value.javaTools
 
-    val javadoc = sbt.inc.Doc.cachedJavadoc(label, cache, javaTools)
+    // val javadoc = sbt.inc.Doc.cachedJavadoc(label, cache, javaTools)
 
     val sources    = apiDocsJavaSources.value.toList.filter(isPublicJavaApiSource)
     val classpath  = apiDocsClasspath.value.toList
@@ -347,6 +351,7 @@ object Docs {
     val log        = streams.value.log
     val reporter   = new LoggedReporter(10, log)
 
+    /*
     javadoc.run(
       sources = sources.map(s => PlainVirtualFile(s.toPath)),
       classpath = classpath.map(s => PlainVirtualFile(s.toPath)),
@@ -357,6 +362,7 @@ object Docs {
       log = log,
       reporter = reporter
     )
+     */
   }
 
   def fixJavadocLinks(apiTarget: File) = {
@@ -562,6 +568,7 @@ object Docs {
     // Full classpath is necessary to ensure that scaladoc and javadoc can see the compiled classes of the other language.
     val tasks = projects.flatMap { p => (p / Compile / fullClasspath).get(structure.data) }
     tasks.join.map(_.flatten.map(_.data).distinct)
+    ???
   }
 
   // Note: webjars are extracted without versions

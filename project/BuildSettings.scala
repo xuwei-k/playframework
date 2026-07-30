@@ -132,15 +132,15 @@ object BuildSettings {
       }
     },
     autoAPIMappings := true,
-    apiMappings ++= {
+    apiMappings ++= Def.uncached {
       val scalaInstance = Keys.scalaInstance.value
       scalaInstance.libraryJars.map { libraryJar =>
-        libraryJar -> url(
+        fileConverter.value.toVirtualFile(libraryJar.toPath) -> url(
           raw"""http://scala-lang.org/files/archive/api/${scalaInstance.actualVersion}/index.html"""
         )
       }.toMap
     },
-    apiMappings ++= {
+    apiMappings ++= Def.uncached {
       // Finds appropriate scala apidoc from dependencies when autoAPIMappings are insufficient.
       // See the following:
       //
@@ -193,7 +193,7 @@ object BuildSettings {
       (for {
         jar <- (Compile / doc / dependencyClasspath).value.toSet ++ (Test / doc / dependencyClasspath).value
         fullyFile = jar.data
-        urlOption = fullyFile.getCanonicalPath match {
+        urlOption = fileConverter.value.toPath(fullyFile).toFile.getCanonicalPath match {
           case ScalaLibraryRegex(v) =>
             Some(url(raw"""http://scala-lang.org/files/archive/api/$v/index.html"""))
 
